@@ -6,11 +6,12 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
 from rest_framework import status
+from rest_framework.generics import GenericAPIView
 from .models import Book, Category
 from .serializers import BookSerializer, CategorySerializer
 from borrow_records.models import BorrowRecord
 from borrow_records.serializers import BorrowRecordSerializer
-from datetime import date
+from datetime import date, timedelta
 
 class BookPagination(PageNumberPagination):
     page_size = 10
@@ -24,36 +25,53 @@ class BookViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'destroy']:
             return [permissions.IsAdminUser()]  
         return [permissions.AllowAny()]  
-    
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
-    def borrow(self, request, pk=None):
-        book = self.get_object()
+
+class BookBorrowView(GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        """Handle borrowing a book."""
+        try:
+            book = Book.objects.get(pk=pk)
+        except Book.DoesNotExist:
+            return Response({'error': 'Book not found.'}, status=status.HTTP_404_NOT_FOUND)
+
         if book.available_copies < 1:
-            return Response({'error': 'No copies available to borrow.'}, status=400)
+            return Response({'error': 'No copies available to borrow.'}, status=status.HTTP_400_BAD_REQUEST)
 
         borrow_record = BorrowRecord.objects.create(
             book=book,
             member=request.user.member,
             borrow_date=date.today(),
-            due_date=date.today() + timedelta(days=14)  
+            due_date=date.today() + timedelta(days=14)
         )
         book.available_copies -= 1
         book.save()
-        return Response(BorrowRecordSerializer(borrow_record).data)
+        return Response(BorrowRecordSerializer(borrow_record).data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
-    def return_book(self, request, pk=None):
-        book = self.get_object()
-        borrow_record = BorrowRecord.objects.filter(book=book, member=request.user.member, is_returned=False).first()
+
+class BookReturnView(GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        """Handle returning a book."""
+        try:
+            book = Book.objects.get(pk=pk)
+        except Book.DoesNotExist:
+            return Response({'error': 'Book not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        borrow_record = BorrowRecord.objects.filter(
+            book=book, member=request.user.member, is_returned=False
+        ).first()
         if not borrow_record:
-            return Response({'error': 'No active borrow record found for this book.'}, status=400)
+            return Response({'error': 'No active borrow record found for this book.'}, status=status.HTTP_400_BAD_REQUEST)
 
         borrow_record.is_returned = True
         borrow_record.return_date = date.today()
         borrow_record.save()
         book.available_copies += 1
         book.save()
-        return Response(BorrowRecordSerializer(borrow_record).data)
+        return Response(BorrowRecordSerializer(borrow_record).data, status=status.HTTP_200_OK)
 
 class BookUpdateView(APIView):
     permission_classes = [IsAdminUser]
