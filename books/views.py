@@ -3,6 +3,9 @@ from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAdminUser
+from rest_framework import status
 from .models import Book, Category
 from .serializers import BookSerializer, CategorySerializer
 from borrow_records.models import BorrowRecord
@@ -18,10 +21,10 @@ class BookViewSet(viewsets.ModelViewSet):
     pagination_class = BookPagination
 
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [permissions.IsAdminUser()]
-        return []  # Allow anonymous users to view books
-
+        if self.action in ['create', 'destroy']:
+            return [permissions.IsAdminUser()]  
+        return [permissions.AllowAny()]  
+    
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def borrow(self, request, pk=None):
         book = self.get_object()
@@ -51,6 +54,35 @@ class BookViewSet(viewsets.ModelViewSet):
         book.available_copies += 1
         book.save()
         return Response(BorrowRecordSerializer(borrow_record).data)
+
+class BookUpdateView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def put(self, request, pk):
+        """Handle full updates (PUT) restricted to admins."""
+        try:
+            book = Book.objects.get(pk=pk)
+        except Book.DoesNotExist:
+            return Response({'error': 'Book not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = BookSerializer(book, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, pk):
+        """Handle partial updates (PATCH) restricted to admins."""
+        try:
+            book = Book.objects.get(pk=pk)
+        except Book.DoesNotExist:
+            return Response({'error': 'Book not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = BookSerializer(book, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
