@@ -15,8 +15,12 @@ class BorrowRecordSerializer(serializers.ModelSerializer):
         book = data.get('book')
         if not book:
             raise serializers.ValidationError("The book field is required.")
-        if BorrowRecord.objects.filter(book=book, return_date__isnull=True).exists():
-            raise serializers.ValidationError("This book is already borrowed and not yet returned.")
+
+        # Check if the current user has already borrowed this book and not returned it
+        active_borrow = BorrowRecord.objects.filter(book=book, member=self.context['request'].user, return_date__isnull=True).exists()
+        if active_borrow:
+            raise serializers.ValidationError("You have already borrowed this book and not yet returned it.")
+
         return data
 
     def create(self, validated_data):

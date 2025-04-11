@@ -3,19 +3,19 @@ from rest_framework.response import Response
 from rest_framework import status
 from books.models import Book
 from .models import BorrowRecord
-from .policies.borrowing_policies import (
-    validate_single_borrow,
-    validate_max_borrow_limit,
-    validate_return_all_books,
-)
+# from .policies.borrowing_policies import (
+#     validate_single_borrow,
+#     validate_max_borrow_limit,
+#     validate_return_all_books,
+# )
 
 def apply_borrowing_policies(user, book):
     """
     Apply borrowing policies to ensure rules are followed.
     """
-    validate_single_borrow(user, book)
-    validate_max_borrow_limit(user)
-    validate_return_all_books(user)
+    # validate_single_borrow(user, book)
+    # validate_max_borrow_limit(user)
+    # validate_return_all_books(user)
 
 def save_borrow_record(serializer):
     """
