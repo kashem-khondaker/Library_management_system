@@ -20,7 +20,7 @@ class Book(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
     ISBN = models.CharField(max_length=13, unique=True, default=uuid.uuid4().hex[:13])
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
-    published_date = models.DateField(null=True, blank=True)
+    published_date = models.DateField(auto_now_add=True)
     total_copies = models.PositiveIntegerField(default=1)
     available_copies = models.PositiveIntegerField(default=1)
     cover_image = models.ImageField(upload_to='book_covers/', null=True, blank=True)
@@ -35,5 +35,3 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
-    class Meta:
-        ordering = ['-published_date']
