@@ -21,6 +21,10 @@ class BorrowRecordViewSet(viewsets.ModelViewSet):
 
     
     def get_queryset(self):
+        # Short-circuit for schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return BorrowRecord.objects.none()
+
         if self.request.user.is_staff:
             return BorrowRecord.objects.select_related('member', 'book')
         return BorrowRecord.objects.filter(member=self.request.user).select_related('book')

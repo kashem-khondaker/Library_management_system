@@ -29,8 +29,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg', 
     'rest_framework',
-    # 'drf_yasg', # 
     'rest_framework_simplejwt',
 
     'books',
