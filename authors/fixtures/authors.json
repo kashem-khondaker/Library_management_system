@@ -1,0 +1,24 @@
+[
+  {
+    "model": "authors.author",
+    "pk": 1,
+    "fields": {
+      "name": "Author 1",
+      "biography": "Biography of Author 1",
+      "date_of_birth": "1980-01-01",
+      "date_of_death": null,
+      "nationality": "American"
+    }
+  },
+  {
+    "model": "authors.author",
+    "pk": 2,
+    "fields": {
+      "name": "Author 2",
+      "biography": "Biography of Author 2",
+      "date_of_birth": "1975-05-15",
+      "date_of_death": null,
+      "nationality": "British"
+    }
+  }
+]
