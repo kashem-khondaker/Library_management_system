@@ -14,6 +14,7 @@ class BorrowRecord(models.Model):
     due_date = models.DateField()
     is_returned = models.BooleanField(default=False)
     fine_amount = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
+    returned = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.member.username} borrowed {self.book.title}"

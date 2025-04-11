@@ -7,7 +7,107 @@ from books.models import Book
 from .models import BorrowRecord
 from .serializers import BorrowRecordSerializer
 from .customLogic import handle_borrow_request
-from datetime import date
+from datetime import date, timedelta
+from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAdminUser
+from borrow_records.models import BorrowRecord
+from borrow_records.serializers import BorrowRecordSerializer
+
+# class BookBorrowView(GenericAPIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#     queryset = Book.objects.select_related('author', 'category').prefetch_related('borrow_records__member')
+#     serializer_class = BookSerializer
+
+#     def post(self, request, pk):
+#         """Handle borrowing a book."""
+#         try:
+#             book = self.get_object()
+#         except Book.DoesNotExist:
+#             return Response(
+#                 {'error': 'Book not found.'}, 
+#                 status=status.HTTP_404_NOT_FOUND
+#             )
+
+#         if book.available_copies < 1:
+#             return Response(
+#                 {'error': 'No copies available to borrow.'}, 
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
+#         # Check if user already has an active borrow record for this book
+#         existing_borrow = BorrowRecord.objects.filter(
+#             book=book,
+#             member=request.user.member,
+#             is_returned=False
+#         ).exists()
+        
+#         if existing_borrow:
+#             return Response(
+#                 {'error': 'You already have an active borrow record for this book.'},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
+#         borrow_record = BorrowRecord.objects.create(
+#             book=book,
+#             member=request.user.member,
+#             borrow_date=date.today(),
+#             due_date=date.today() + timedelta(days=14)
+#         )
+#         book.available_copies -= 1
+#         book.save()
+        
+#         return Response(
+#             BorrowRecordSerializer(borrow_record).data, 
+#             status=status.HTTP_200_OK
+#         )
+
+# class BookReturnView(GenericAPIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#     queryset = Book.objects.all()
+#     serializer_class = BookSerializer
+
+#     def post(self, request, pk):
+#         """Handle returning a book."""
+#         try:
+#             book = self.get_object()
+#         except Book.DoesNotExist:
+#             return Response(
+#                 {'error': 'Book not found.'}, 
+#                 status=status.HTTP_404_NOT_FOUND
+#             )
+
+#         borrow_record = BorrowRecord.objects.filter(
+#             book=book, 
+#             member=request.user.member, 
+#             is_returned=False
+#         ).first()
+        
+#         if not borrow_record:
+#             return Response(
+#                 {'error': 'No active borrow record found for this book.'}, 
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
+#         # Calculate fine if returned after due date
+#         fine = 0
+#         if date.today() > borrow_record.due_date:
+#             days_late = (date.today() - borrow_record.due_date).days
+#             fine = days_late * 10  # Assuming 10 currency units per day late
+
+#         borrow_record.is_returned = True
+#         borrow_record.return_date = date.today()
+#         borrow_record.fine = fine
+#         borrow_record.save()
+        
+#         book.available_copies += 1
+#         book.save()
+        
+#         return Response({
+#             'borrow_record': BorrowRecordSerializer(borrow_record).data,
+#             'fine': fine
+#         }, status=status.HTTP_200_OK)
+
 
 class BorrowRecordViewSet(viewsets.ModelViewSet):
     """
