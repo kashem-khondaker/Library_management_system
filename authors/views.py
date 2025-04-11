@@ -10,7 +10,6 @@ class AuthorViewSet(viewsets.ModelViewSet):
     serializer_class = AuthorSerializer
 
     def get_queryset(self):
-        # Optionally filter authors by name query parameter
         queryset = super().get_queryset()
         name = self.request.query_params.get('name', None)
         if name:

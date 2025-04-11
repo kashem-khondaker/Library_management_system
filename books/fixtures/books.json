@@ -1,0 +1,32 @@
+[
+  {
+    "model": "books.book",
+    "pk": 1,
+    "fields": {
+      "title": "Book 1",
+      "author": 1,
+      "ISBN": "1234567890123",
+      "category": 1,
+      "published_date": "2020-01-01",
+      "total_copies": 5,
+      "available_copies": 5,
+      "cover_image": "",
+      "availability_status": true
+    }
+  },
+  {
+    "model": "books.book",
+    "pk": 2,
+    "fields": {
+      "title": "Book 2",
+      "author": 2,
+      "ISBN": "9876543210987",
+      "category": 2,
+      "published_date": "2021-06-15",
+      "total_copies": 3,
+      "available_copies": 3,
+      "cover_image": "",
+      "availability_status": true
+    }
+  }
+]

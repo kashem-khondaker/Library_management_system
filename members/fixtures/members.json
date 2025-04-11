@@ -1,0 +1,28 @@
+[
+  {
+    "model": "members.member",
+    "pk": 1,
+    "fields": {
+      "name": "Member 1",
+      "email": "member1@example.com",
+      "phone_number": "1234567890",
+      "address": "123 Main St",
+      "membership_date": "2025-01-01",
+      "membership_type": "Regular",
+      "is_active": true
+    }
+  },
+  {
+    "model": "members.member",
+    "pk": 2,
+    "fields": {
+      "name": "Member 2",
+      "email": "member2@example.com",
+      "phone_number": "0987654321",
+      "address": "456 Elm St",
+      "membership_date": "2025-02-01",
+      "membership_type": "Premium",
+      "is_active": true
+    }
+  }
+]

@@ -1,0 +1,28 @@
+[
+  {
+    "model": "borrow_records.borrowrecord",
+    "pk": 1,
+    "fields": {
+      "book": 1,
+      "member": 1,
+      "borrow_date": "2025-04-01",
+      "return_date": null,
+      "due_date": "2025-04-15",
+      "is_returned": false,
+      "fine_amount": 0.0
+    }
+  },
+  {
+    "model": "borrow_records.borrowrecord",
+    "pk": 2,
+    "fields": {
+      "book": 2,
+      "member": 2,
+      "borrow_date": "2025-04-05",
+      "return_date": null,
+      "due_date": "2025-04-19",
+      "is_returned": false,
+      "fine_amount": 0.0
+    }
+  }
+]
